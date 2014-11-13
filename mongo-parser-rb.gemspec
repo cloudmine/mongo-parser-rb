@@ -4,9 +4,9 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'mongo-parser-rb/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "mongo-parser-rb"
+  gem.name          = "mongo-parser-rb-cloudmine"
   gem.version       = MongoParserRB::VERSION
-  gem.authors       = ["Ben McRedmond"]
+  gem.authors       = ["Ben McRedmond", "John McCarthy"]
   gem.email         = ["ben@intercom.io"]
   gem.description   = %q{Parse and evaluate mongo queries in Ruby}
   gem.summary       = gem.description

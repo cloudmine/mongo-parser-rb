@@ -6,7 +6,8 @@ module MongoParserRB
 
         def inversion_operators
           @inversion_operators ||= [
-            :$not
+            :$not,
+            "$not"
           ]
         end
 
@@ -17,7 +18,9 @@ module MongoParserRB
         def conjunction_operators
           @conjunction_operators ||= [
             :$and,
-            :$or
+            :$or,
+            "$or",
+            "$and"
           ]
         end
 
@@ -28,7 +31,9 @@ module MongoParserRB
         def negative_equality_operators
           @negative_equality_operators ||= [
             :$nin,
-            :$ne
+            :$ne,
+            "$nin",
+            "$ne"
           ]
         end
 
@@ -39,7 +44,13 @@ module MongoParserRB
             :$lt,
             :$gte,
             :$lte,
-            :$in
+            :$in,
+            "$eq",                        
+            "$gt",            
+            "$lt",
+            "$gte",
+            "$lte",
+            "$in"
           ] | negative_equality_operators
         end
 
@@ -110,11 +121,11 @@ module MongoParserRB
 
       def evaluate_conjunction(document)
         case @operator
-        when :$and
+        when :$and, "$and"
           @arguments.all? do |arg|
             arg.evaluate(document)
           end
-        when :$or
+        when :$or, "$or"
           @arguments.any? do |arg|
             arg.evaluate(document)
           end
@@ -125,7 +136,7 @@ module MongoParserRB
         value_for_field = @field.value_in_document(document)
 
         case @operator
-        when :$ne
+        when :$ne, "$ne"
           # Mongo negative equality operators return true when
           # the specified field does not exist on a document.
           return true if !value_for_field && !@field.in_document?(document)
@@ -136,7 +147,7 @@ module MongoParserRB
           else
             value_for_field != @arguments
           end
-        when :$nin
+        when :$nin, "$nin"
           if value_for_field.kind_of?(Array)
             (value_for_field & @arguments).length.zero?
           else
@@ -149,7 +160,7 @@ module MongoParserRB
         value_for_field = @field.value_in_document(document)
 
         case @operator
-        when :$eq
+        when :$eq, "$eq"
           if @arguments.kind_of?(Regexp)
             !!(value_for_field =~ @arguments)
           elsif value_for_field.kind_of?(Array) && 
@@ -158,15 +169,15 @@ module MongoParserRB
           else
             value_for_field == @arguments
           end
-        when :$gt
+        when :$gt, "$gt"
           value_for_field > @arguments
-        when :$gte
+        when :$gte, "$gte"
           value_for_field >= @arguments
-        when :$lt
+        when :$lt, "$lt"
           value_for_field < @arguments
-        when :$lte
+        when :$lte, "$lte"
           value_for_field <= @arguments
-        when :$in
+        when :$in, "$in"
           if value_for_field.kind_of?(Array)
             (value_for_field & @arguments).length > 0
           else
